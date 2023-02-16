@@ -1,0 +1,13 @@
+﻿Create methods:
+
+// Returns random string from given array
+public static string Random(this string[] strs);
+public static string Random(this string[] strs, System.Random rand); // seed implementation
+public static string Random(this object[] objs);
+public static string Random(this object[] objs, System.Random rand); // seed implementation
+
+// Misses null checkout
+public static string RandomUnsave(this string[] strs);
+public static string RandomUnsave(this string[] strs, System.Random rand); // seed implementation
+public static string RandomUnsave(this object[] objs);
+public static string RandomUnsave(this object[] objs, System.Random rand);

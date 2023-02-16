@@ -1,0 +1,32 @@
+QuitCodes:{
+	1 - When game starts, Main mod load scripts cannot exit without error. Try reinstall your game or check console for more info (also you can report about this in my discord: DarkJune#0122).
+	2 - When game starts, ModObjectLoader can't exit without error. Maybe, your mod can have some issues.
+
+
+}
+
+[EDIT] - mark for code, that must be changed ehrn it's avable, because now it's work by only one way.
+[FINAL] - Need to be changed after all development. Application quit cases - large part of all this final changes.
+[OLD] - Old parts of code, that was marked as [Edit] before some edits.
+
+## Texture region:
+Shields: Have a sprite for every size. like, "Standart_ShieldTexture_" + 1x1, 2x2, 3x3, 4x4 (as string)
+	If any texture found - finding by name "Standart_ShieldTexture_Default"
+	Shields, like 1x3, 5x9, 999x999, supported, but game doesn't have texture for this (game will use standart shield texture for this situation)
+
+## Task region: (Now replaced with Naninovel)
+Task format (first argument - task name, all next - additional arguments):
+	Wait(float Time)
+	Jump(int TaskID) // Use carefully! If anywhere after point, in that you jump, you have ANY task with unit,
+		all this tasks must have #(mark for skippable task), to prevent some problems
+	TriggerNext(Vector2 position, Vector2 colliderSize, bool innerCollider)
+	TriggerNext(Vector2 position, Vector2 colliderSize, bool innerCollider, @ID) // Wait until Unit enter or out of collider
+	TriggerNext(Vector2 position, Vector2 colliderSize, bool innerCollider, @ID) // Wait until Unit enter or out of collider
+	ObjectiveKill(@ID)
+	
+	InitDialog(string fileName, bool interact)
+	@Go
+	@Hide
+	@Show
+	@Minimize
+	@Maximize
