@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SeveranceStrategy.Buildings.Processing
 {
-    public class Processor : HealthObject
+    public class Processor : DynamicInstance
     {
         [Header(nameof(Processor))]
         [SerializeField] protected string[] m_receipts;

@@ -1,0 +1,6 @@
+{"name":"testGame","description":"","recap":"","chunkSize":{"x":16,"y":16},"seed":-338643059,"generatorID":0,"generatable":true}
+environment:c:StaticObject
+pattern:
+instances:
+structures:
+units:

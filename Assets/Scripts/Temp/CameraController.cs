@@ -85,8 +85,8 @@ namespace SeveranceStrategy.User
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Vector2 HandleInput()
-            => new(x: (Input.GetKey(Keybinds.Global.MoveLeft) ? -1 : 0) + (Input.GetKey(Keybinds.Global.MoveRight) ? 1 : 0),
-                   y: (Input.GetKey(Keybinds.Global.MoveDown) ? -1 : 0) + (Input.GetKey(Keybinds.Global.MoveUp) ? 1 : 0));
+            => new(x: (Input.GetKey(Keybinds.MoveLeft.Value) ? -1 : 0) + (Input.GetKey(Keybinds.MoveRight.Value) ? 1 : 0),
+                   y: (Input.GetKey(Keybinds.MoveDown.Value) ? -1 : 0) + (Input.GetKey(Keybinds.MoveUp.Value) ? 1 : 0));
 
 
 #if UNITY_EDITOR

@@ -1,10 +1,9 @@
 ﻿using SeveranceStrategy.Blocks;
 using SeveranceStrategy.Turrets;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SeveranceStrategy
+namespace SeveranceStrategy.Old
 {
     internal class GameManager : MonoBehaviour
     {

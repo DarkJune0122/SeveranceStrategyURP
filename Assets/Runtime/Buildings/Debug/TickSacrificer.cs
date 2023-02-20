@@ -19,11 +19,7 @@ namespace SeveranceStrategy.Buildings.Debugging
 
         private void Update()
         {
-            if (!m_isDirty)
-            {
-                return;
-            }
-
+            if (!m_isDirty) return;
             m_counterText.text = m_health.ToString();
         }
         protected override void OnDestroy()

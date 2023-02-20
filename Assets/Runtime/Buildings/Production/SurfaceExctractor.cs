@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SeveranceStrategy.Buildings.Production
 {
-    public class SurfaceExctractor : HealthObject
+    public class SurfaceExctractor : DynamicInstance
     {
         public SurfaceOre Ore
         {

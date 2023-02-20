@@ -7,11 +7,11 @@ using UnityEngine;
 public static class SoftMath
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int RoundToUpper(int x, int y) => (x + y - 1) / y;
+    public static int DivideToUpper(int x, int y) => (x + y - 1) / y;
 
 
 
-    #region
+    #region Angle Compartion
     public static bool AngleDiffLarger(float current, float target, float maxDiff)
     {
         current = Mathf.DeltaAngle(current, target);

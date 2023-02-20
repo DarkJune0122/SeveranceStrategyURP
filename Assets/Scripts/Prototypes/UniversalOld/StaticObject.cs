@@ -3,7 +3,7 @@ using SeveranceStrategy.UI;
 using UnityEngine;
 using Object = System.Object;
 
-namespace SeveranceStrategy
+namespace SeveranceStrategy.Old
 {
     public class StaticObject : Object
     {
