@@ -1,4 +1,4 @@
-﻿using SeveranceStrategy.Projectiles;
+﻿using SeveranceStrategy.ProjectilesOld;
 using UnityEngine;
 
 namespace SeveranceStrategy.Turrets

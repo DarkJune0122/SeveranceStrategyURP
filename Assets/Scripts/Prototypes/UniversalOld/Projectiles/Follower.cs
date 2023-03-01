@@ -3,7 +3,7 @@ using SeveranceStrategy.User;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace SeveranceStrategy.Projectiles
+namespace SeveranceStrategy.ProjectilesOld
 {
     /*public class Follower : Projectile
     {

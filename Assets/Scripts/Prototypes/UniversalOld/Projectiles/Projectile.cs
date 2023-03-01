@@ -1,8 +1,7 @@
 ﻿using SeveranceStrategy.Turrets;
-using System.Collections;
 using UnityEngine;
 
-namespace SeveranceStrategy.Projectiles
+namespace SeveranceStrategy.ProjectilesOld
 {
     public abstract class Projectile : MonoBehaviour
     {
