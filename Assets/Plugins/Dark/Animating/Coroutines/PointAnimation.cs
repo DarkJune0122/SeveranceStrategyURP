@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using UnityEngine;
 
 namespace Dark.Animation.Coroutines
@@ -31,9 +30,9 @@ namespace Dark.Animation.Coroutines
         /// Speed of animation.
         /// </summary>
         /// <remarks>
-        /// [Note] Negative values can be not supported for some type of animations.
+        /// [Note] Negative values can not be supported for some type of animations.
         /// </remarks>
-        public float speed = 1f;
+        [NonSerialized] public float speed = 1f;
 
         /// <summary>
         /// Animation executer

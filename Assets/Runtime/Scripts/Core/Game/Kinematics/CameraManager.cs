@@ -1,6 +1,5 @@
-﻿using Dark;
+﻿using Dark.Animation.Coroutines;
 using SeveranceStrategy.Core;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,57 +8,89 @@ namespace SeveranceStrategy.Game.Kinematics
     public sealed class CameraManager : MonoBehaviour, IDragHandler
     {
         public static CameraManager Instance => m_instance;
-        public static Camera Camera => m_instance.m_camera;
+        public Camera Camera => m_camera;
+        public float Offset => -m_camera.transform.localPosition.z;
 
         [SerializeField] private Transform m_movementAnchor;
         [SerializeField] private Transform m_rotationAnchor;
         [SerializeField] private Camera m_camera;
         [SerializeField] private Transform m_pointer;
         [SerializeField] private Vector2 m_rotationSpeed = new(40f, 24f);
+        [SerializeField] private Vector2 m_slideSpeed = new(1f, 1f);
         //[SerializeField, Range(0.5f, 1f)] private float m_altitideChangeSpeed = 0.9f;
+        [Header("Animating")]
+        [SerializeField] private AnimationCurve m_zoomValueCurve = AnimationCurve.Linear(0, 2, 10, 30);
+        [Tooltip("Value bounds: [0:1]  Time bounds: [0:1]")]
+        [SerializeField] private PointCurve m_smoothZoomCurve = new()
+        {
+            curve = AnimationCurve.Linear(0, 0, 1, 1),
+        };
 
 
 
         private static CameraManager m_instance;
-        private bool m_rightMouseState;
-        private float m_scrollDelta;
+        private bool m_rotationKeyState;
+        private bool m_slideKeyState;
+        private float m_zoomTime = 2;
+        private float m_zoomInitialValue, m_zoomValueDelta;
         private CameraManager() => m_instance = this;
-        private void Awake() => Settings.FoV.onValueChange += SettingsFoV_OnValueChanged;
+        private void Awake()
+        {
+            m_smoothZoomCurve.executer = this;
+            m_smoothZoomCurve.action = (evaluate) => m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomInitialValue + m_zoomValueDelta * -evaluate);
+            Settings.FoV.onValueChange += SettingsFoV_OnValueChanged;
+        }
+
         private void OnDestroy()
         {
             Settings.FoV.onValueChange -= SettingsFoV_OnValueChanged;
-            if (m_instance == this)
-            {
-                m_instance = null;
-            }
+            if (m_instance == this) m_instance = null;
         }
 
+        // Delegates
         private void SettingsFoV_OnValueChanged(int fov) => m_camera.fieldOfView = fov;
 
 
         // Input handling
+        private void OnEnable()
+        {
+            if (Settings.SmoothCameraZoom.Value) Debug.Log("Smooth camera is not supported!");
+        }
+        //m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomValueCurve.Evaluate(m_zoomTime));
         private void Update()
         {
-            // Camera Z offset handling and changing.
-            m_scrollDelta = Input.mouseScrollDelta.y;
-            const float MinOffset = -33f, MaxOffset = -3f;
-            if (m_scrollDelta != 0)
+            float scrollDelta = Input.mouseScrollDelta.y;
+            if (scrollDelta != 0)
             {
-                Debug.Log(m_scrollDelta);
-                m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(Mathf.Clamp(
-                    value: m_camera.transform.localPosition.z - m_scrollDelta * 3 * (Settings.InvertZoom.Value ? -1 : 1),
-                    min: MinOffset, max: MaxOffset));
+                m_smoothZoomCurve.action.Invoke(1f);
+
+                // Smooth camera implementation
+                // Required initial animation value.
+                m_zoomInitialValue = m_smoothZoomCurve.IsIdle ? m_zoomTime : m_zoomTime + m_smoothZoomCurve.time;
+                
+                // Handling inputs.
+                m_zoomTime = Mathf.Clamp(m_zoomTime - scrollDelta * (Settings.InvertZoom.Value ? -1 : 1), min: m_zoomValueCurve.FirstKey().value, max: m_zoomValueCurve.DurationUnsafe());
+                
+                // Required animation delta setup.
+                m_zoomValueDelta = m_zoomValueCurve.Evaluate(m_zoomTime) - m_zoomInitialValue;
+
+                if (Settings.SmoothCameraZoom.Value) m_smoothZoomCurve.Start();
+                else m_smoothZoomCurve.action.Invoke(1f);
             }
 
-            // Key check to avoid overheats.
+            // Key check to avoid overheat.
             if (Input.anyKey == false)
             {
-                m_rightMouseState = false;
+                m_rotationKeyState = false;
                 return;
             }
 
             /// Camera rotation (<seealso cref="OnDrag"/> further down):
-            m_rightMouseState = Input.GetMouseButton(1);
+            if (m_slideKeyState = Input.GetKey(Keybinds.CameraSlideKey.Value))
+            {
+                m_rotationKeyState = false;
+            }
+            else m_rotationKeyState = Input.GetKey(Keybinds.CameraRotationKey.Value);
 
             // Cemera movement:
             Vector2 input = new(Inputs.GetAxis(Keybinds.MoveLeft.Value, Keybinds.MoveRight.Value), Inputs.GetAxis(Keybinds.MoveUp.Value, Keybinds.MoveDown.Value));
@@ -80,11 +111,20 @@ namespace SeveranceStrategy.Game.Kinematics
 
         void IDragHandler.OnDrag(PointerEventData eventData)
         {
-            if (!m_rightMouseState) return;
-            Vector3 rotation = m_rotationAnchor.localEulerAngles;
-            rotation.x += eventData.delta.y * Time.unscaledDeltaTime * m_rotationSpeed.y * (Settings.InvertY.Value ? -1 : 1);
-            rotation.y += eventData.delta.x * Time.unscaledDeltaTime * m_rotationSpeed.x * (Settings.InvertX.Value ? -1 : 1);
-            m_rotationAnchor.localEulerAngles = rotation;
+            if (m_slideKeyState)
+            {
+                Vector3 slide = Vector3.zero;
+                slide += eventData.delta.y * (Settings.InvertYSlide.Value ? -1 : 1) * m_slideSpeed.y * Time.unscaledDeltaTime * m_rotationAnchor.up;
+                slide += eventData.delta.x * (Settings.InvertXSlide.Value ? -1 : 1) * m_slideSpeed.x * Time.unscaledDeltaTime * m_rotationAnchor.right;
+                m_movementAnchor.Translate(slide);
+            }
+            else if (m_rotationKeyState)
+            {
+                Vector3 rotation = m_rotationAnchor.localEulerAngles;
+                rotation.x += eventData.delta.y * Time.unscaledDeltaTime * m_rotationSpeed.y * (Settings.InvertYRotation.Value ? -1 : 1);
+                rotation.y += eventData.delta.x * Time.unscaledDeltaTime * m_rotationSpeed.x * (Settings.InvertXRotation.Value ? -1 : 1);
+                m_rotationAnchor.localEulerAngles = rotation;
+            }
         }
 
 

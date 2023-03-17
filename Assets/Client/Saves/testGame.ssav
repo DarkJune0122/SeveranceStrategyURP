@@ -1,5 +1,5 @@
-{"name":"testGame","description":"","recap":"","chunkSize":{"x":16,"y":16},"seed":-338643059,"generatorID":0,"generatable":true}
-environment:c:StaticObject
+{"name":"testGame","description":"","recap":"","chunkSize":{"x":16,"y":16},"seed":-1814316571,"generatorID":0,"generatable":true}
+environment:c:StaticInstance
 pattern:
 instances:
 structures:

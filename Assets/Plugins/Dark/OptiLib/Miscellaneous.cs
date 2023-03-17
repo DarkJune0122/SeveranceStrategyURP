@@ -325,18 +325,25 @@ public static partial class Miscellaneous
     /// </summary>
     /// <returns>total time</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Duration(this AnimationCurve curve)
+    public static float DurationUnsafe(this AnimationCurve curve)
     {
-        return curve[curve.length - 1].time;
+        return curve.LastKey().time;
     }
     /// <summary>
     /// Returns last keyframe of given curve
     /// </summary>
-    /// <returns>Last keyframe in array</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Keyframe LastKey(this AnimationCurve curve)
     {
         return curve[curve.length - 1];
+    }
+    /// <summary>
+    /// Returns first keyframe of given curve
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Keyframe FirstKey(this AnimationCurve curve)
+    {
+        return curve[0];
     }
     #endregion
 

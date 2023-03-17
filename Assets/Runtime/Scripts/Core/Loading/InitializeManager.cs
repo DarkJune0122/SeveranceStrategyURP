@@ -1,5 +1,4 @@
-﻿using SeveranceStrategy.Buildings;
-using SeveranceStrategy.Loading;
+﻿using SeveranceStrategy.Loading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

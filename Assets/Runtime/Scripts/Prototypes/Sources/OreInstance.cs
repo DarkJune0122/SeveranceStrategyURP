@@ -1,17 +1,26 @@
-﻿using SeveranceStrategy.Buildings;
-using SeveranceStrategy.Game;
+﻿using SeveranceStrategy.Game;
+using SeveranceStrategy.Protoinfo;
+using SeveranceStrategy.Protoinfo.Sources;
+using UnityEngine;
 
 namespace SeveranceStrategy.Prototypes.Sources
 {
-    public class OreInstance : StaticInstance
+    public class OreInstance : BlockIntance
     {
-        public int amount = 40;
+        [SerializeField] protected int amount = 40;
 
+
+        protected OreInfo info;
         private void Awake() => GameManager.ores.Add(this);
         private void OnDestroy() => GameManager.ores.Remove(this);
+        public override void Setup(BlockInfo info)
+        {
+            base.Setup(info);
+            this.info = (OreInfo)info;
+            amount = this.info.amount;
+        }
 
-
-        public int GetAmount(int amount)
+        public int Extract(int amount)
         {
             this.amount -= amount;
             if (this.amount > 0) return amount;

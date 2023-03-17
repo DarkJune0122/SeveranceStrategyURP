@@ -19,12 +19,16 @@ namespace SeveranceStrategy
         public static readonly BooleanParam UIAnimations = new(nameof(UIAnimations), true);
         public static readonly BooleanParam Animations = new(nameof(Animations), true);
 
-        public static readonly BooleanParam InvertX = new(nameof(InvertX), false);
-        public static readonly BooleanParam InvertY = new(nameof(InvertY), true);
-        public static readonly BooleanParam InvertZoom = new(nameof(InvertZoom), true);
+        // Camera
+        public static readonly BooleanParam SmoothCameraZoom = new(nameof(SmoothCameraZoom), true);
+        public static readonly BooleanParam InvertZoom = new(nameof(InvertZoom), false);
+        public static readonly BooleanParam InvertXSlide = new(nameof(InvertXSlide), false);
+        public static readonly BooleanParam InvertYSlide = new(nameof(InvertYSlide), false);
+        public static readonly BooleanParam InvertXRotation = new(nameof(InvertXRotation), false);
+        public static readonly BooleanParam InvertYRotation = new(nameof(InvertYRotation), true);
 
         // Gameplay:
-        public static readonly IntRangeParam FoV = new(nameof(FoV), 90, min: 60, max: 120);
+        public static readonly IntRangeParam FoV = new(nameof(FoV), 90, min: 30, max: 120);
 
         // Advanced UI:
         public static readonly BooleanParam ShowSaveFilePath = new(nameof(ShowSaveFilePath), false);

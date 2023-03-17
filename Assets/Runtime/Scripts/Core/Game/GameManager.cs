@@ -1,10 +1,12 @@
 ﻿using SeveranceStrategy.Core;
 using SeveranceStrategy.Game.Generators;
+using SeveranceStrategy.Game.Kinematics;
 using SeveranceStrategy.IO;
 using SeveranceStrategy.Loading;
 using SeveranceStrategy.Prototypes.Sources;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -26,50 +28,6 @@ namespace SeveranceStrategy.Game
 
         private static GameManager m_instance;
         private GameManager() => m_instance = this;
-        private void OnDrawGizmos()
-        {
-            if (!Application.isPlaying) return;
-
-            Camera camera = Camera.main;
-            if (!Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
-            {
-                return;
-            }
-            
-            float scaleRatio = 0.01f * camera.fieldOfView;
-
-            const float OreMagnitudeDistance = 2.4f * 2.4f;
-            if (GetClosestOre(hit.point, out OreInstance ore) > OreMagnitudeDistance)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(hit.point, hit.point + scaleRatio * hit.normal);
-            }
-            else
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(ore.transform.position, ore.transform.position + scaleRatio * ore.transform.up);
-            }
-
-
-            // Determine closest ore from ore array.
-            static float GetClosestOre(Vector3 source, out OreInstance instance)
-            {
-                instance = null;
-                float minDistance = float.PositiveInfinity;
-
-                // Finsing closest to source ore
-                foreach (OreInstance ore in ores)
-                {
-                    float dist = (ore.transform.position - source).sqrMagnitude;
-                    if (minDistance > dist)
-                    {
-                        minDistance = dist;
-                        instance = ore;
-                    }
-                }
-                return minDistance;
-            }
-        }
 
 
 
@@ -123,8 +81,13 @@ namespace SeveranceStrategy.Game
             LoadManager.StartLoading(() => shouldWait = false, useBackground: true, useProgressBar: true, "SaveFile loading begins...");
             while (shouldWait) yield return null; // Waits until fade will be shown
 
+#if UNITY_EDITOR
+            m_sceneLoadingOperation = SceneManager.LoadSceneAsync(m_instance.m_gameScene);
+            yield return m_sceneLoadingOperation;
+#else
             yield return SceneManager.LoadSceneAsync(m_instance.m_gameScene);
-            using SaveFile.MapData mapData = file.LoadData();
+#endif
+            using SaveFile.MapData mapData = file.LoadData(); // Preloading map data
             Map map = new(file.chunkSize.x, file.chunkSize.y);
 
             LoadManager.Progress("Map loading skiped successfully!", 1f);
@@ -235,7 +198,51 @@ namespace SeveranceStrategy.Game
 #endif
         }
 #if UNITY_EDITOR
-        private void OnValidate() => m_seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+        public static bool PreventGizmosDraw => !Application.isPlaying || (m_sceneLoadingOperation is not null && !m_sceneLoadingOperation.isDone);
+        private static AsyncOperation m_sceneLoadingOperation;
+        private void OnValidate() => m_seed = Random.Range(int.MinValue, int.MaxValue);
+        private void OnDrawGizmos()
+        {
+            if (PreventGizmosDraw || !CameraManager.Instance) return;
+
+            if (!Physics.Raycast(CameraManager.Instance.Camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
+            {
+                return;
+            }
+
+            const float LineScale = 2f;
+            float oreMagnitudeDistance = CameraManager.Instance.Offset * 0.08f;
+            if (GetClosestOre(hit.point, out OreInstance ore) > oreMagnitudeDistance)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(hit.point, hit.point + LineScale * hit.normal);
+            }
+            else
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(ore.transform.position, ore.transform.position + LineScale * ore.transform.up);
+            }
+
+
+            // Determine closest ore from ore array.
+            static float GetClosestOre(Vector3 source, out OreInstance instance)
+            {
+                instance = null;
+                float minDistance = float.PositiveInfinity;
+
+                // Finsing closest to source ore
+                foreach (OreInstance ore in ores)
+                {
+                    float dist = (ore.transform.position - source).sqrMagnitude;
+                    if (minDistance > dist)
+                    {
+                        minDistance = dist;
+                        instance = ore;
+                    }
+                }
+                return minDistance;
+            }
+        }
 #endif
     }
 }
