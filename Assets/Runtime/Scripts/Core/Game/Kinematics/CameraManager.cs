@@ -20,11 +20,6 @@ namespace SeveranceStrategy.Game.Kinematics
         //[SerializeField, Range(0.5f, 1f)] private float m_altitideChangeSpeed = 0.9f;
         [Header("Animating")]
         [SerializeField] private AnimationCurve m_zoomValueCurve = AnimationCurve.Linear(0, 2, 10, 30);
-        [Tooltip("Value bounds: [0:1]  Time bounds: [0:1]")]
-        [SerializeField] private PointCurve m_smoothZoomCurve = new()
-        {
-            curve = AnimationCurve.Linear(0, 0, 1, 1),
-        };
 
 
 
@@ -32,14 +27,8 @@ namespace SeveranceStrategy.Game.Kinematics
         private bool m_rotationKeyState;
         private bool m_slideKeyState;
         private float m_zoomTime = 2;
-        private float m_zoomInitialValue, m_zoomValueDelta;
         private CameraManager() => m_instance = this;
-        private void Awake()
-        {
-            m_smoothZoomCurve.executer = this;
-            m_smoothZoomCurve.action = (evaluate) => m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomInitialValue + m_zoomValueDelta * -evaluate);
-            Settings.FoV.onValueChange += SettingsFoV_OnValueChanged;
-        }
+        private void Awake() => Settings.FoV.onValueChange += SettingsFoV_OnValueChanged;
 
         private void OnDestroy()
         {
@@ -52,30 +41,15 @@ namespace SeveranceStrategy.Game.Kinematics
 
 
         // Input handling
-        private void OnEnable()
-        {
-            if (Settings.SmoothCameraZoom.Value) Debug.Log("Smooth camera is not supported!");
-        }
-        //m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomValueCurve.Evaluate(m_zoomTime));
+        private void OnEnable() => m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomValueCurve.Evaluate(m_zoomTime));
         private void Update()
         {
             float scrollDelta = Input.mouseScrollDelta.y;
             if (scrollDelta != 0)
             {
-                m_smoothZoomCurve.action.Invoke(1f);
-
-                // Smooth camera implementation
-                // Required initial animation value.
-                m_zoomInitialValue = m_smoothZoomCurve.IsIdle ? m_zoomTime : m_zoomTime + m_smoothZoomCurve.time;
-                
                 // Handling inputs.
                 m_zoomTime = Mathf.Clamp(m_zoomTime - scrollDelta * (Settings.InvertZoom.Value ? -1 : 1), min: m_zoomValueCurve.FirstKey().value, max: m_zoomValueCurve.DurationUnsafe());
-                
-                // Required animation delta setup.
-                m_zoomValueDelta = m_zoomValueCurve.Evaluate(m_zoomTime) - m_zoomInitialValue;
-
-                if (Settings.SmoothCameraZoom.Value) m_smoothZoomCurve.Start();
-                else m_smoothZoomCurve.action.Invoke(1f);
+                m_camera.transform.localPosition = m_camera.transform.localPosition.Set_Z(-m_zoomValueCurve.Evaluate(m_zoomTime));
             }
 
             // Key check to avoid overheat.
@@ -126,8 +100,6 @@ namespace SeveranceStrategy.Game.Kinematics
                 m_rotationAnchor.localEulerAngles = rotation;
             }
         }
-
-
 
 
 #if UNITY_EDITOR

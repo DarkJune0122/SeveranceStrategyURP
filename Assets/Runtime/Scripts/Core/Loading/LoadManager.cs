@@ -1,9 +1,7 @@
 using Dark.Animation.Coroutines;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 using Image = UnityEngine.UI.Image;
 
 namespace SeveranceStrategy.Loading

@@ -1,0 +1,8 @@
+
+@createBlock OreDeposit position:1'1'1 rotation:60'30'60
+
+Hey!
+
+It's a test message!
+
+@stop

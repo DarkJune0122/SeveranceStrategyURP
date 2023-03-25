@@ -1,6 +1,6 @@
 using SeveranceStrategy.Protoinfo;
-using SeveranceStrategy.Prototypes.Sources;
 using UnityEngine;
+using Naninovel;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,11 +11,16 @@ namespace SeveranceStrategy
     {
         [SerializeField] private BlockInfo m_prototype;
         [SerializeField] private Transform m_anchor;
+        [SerializeField] private Script m_testScript;
 
         private void Awake()
         {
-            OreInstance ore = m_prototype.CreatePrototype<OreInstance>(m_anchor);
-            ore.transform.localPosition = ore.transform.localPosition.Set_Y(ore.transform.localPosition.y + ore.transform.localScale.y * 0.5f);
+            IScriptPlayer scriptPlayer = Engine.GetService<IScriptPlayer>();
+            scriptPlayer.Play(m_testScript);
+
+            //OreInstance ore = m_prototype.CreatePrototype<OreInstance>(m_anchor);
+            //ore.transform.localPosition = ore.transform.localPosition.Set_Y(ore.transform.localPosition.y + ore.transform.localScale.y * 0.5f);
+
             //BlockInfo.GetInfo<OreInfo>(m_prototype.name).CreatePrototype<OreInstance>(m_anchor);
         }
 

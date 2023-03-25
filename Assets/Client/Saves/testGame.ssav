@@ -1,4 +1,4 @@
-{"name":"testGame","description":"","recap":"","chunkSize":{"x":16,"y":16},"seed":-1814316571,"generatorID":0,"generatable":true}
+{"name":"testGame","description":"","recap":"","chunkSize":{"x":16,"y":16},"seed":559035971,"generatorID":0,"generatable":true}
 environment:c:StaticInstance
 pattern:
 instances:
